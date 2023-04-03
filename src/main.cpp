@@ -55,7 +55,6 @@ void setup() {
   xTaskCreate(Taskone,"TaskOne",10000,NULL,1,&taskone);//创建Taskone
   xTaskCreate(Tasktwo,"TaskTwo",10000,NULL,1,&tasktwo);//创建Tasktwo
   SSR_Init();
-  // pinMode(SSR_PIN,OUTPUT);
 
 }
 void loop() {
