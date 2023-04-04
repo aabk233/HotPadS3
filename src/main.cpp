@@ -4,14 +4,49 @@
 #include"SSR.h"
 #include"Buzzer.h"
 #include"Max6675.h"
+#include"lvgl.h"
+#include"TFT_eSPI.h"
 
+///////////////LCD&LVGL
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+static lv_disp_draw_buf_t draw_buf;//显示器变量
+static lv_color_t buf[TFT_WIDTH * 10];//刷新缓存
+TFT_eSPI tft=TFT_eSPI();
+void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color_p)
+{
+    uint32_t w = (area->x2 - area->x1 + 1);
+    uint32_t h = (area->y2 - area->y1 + 1);
+ 
+    tft.startWrite();                                        //使能写功能
+    tft.setAddrWindow(area->x1, area->y1, w, h);             //设置填充区域
+    tft.pushColors((uint16_t *)&color_p->full, w * h, true); //写入颜色缓存和缓存大小
+    tft.endWrite();                                          //关闭写功能
+ 
+    lv_disp_flush_ready(disp); //调用区域填充颜色函数
+}
+
+void LCD_Init()
+{
+    tft.init();
+    tft.setRotation(0);
+    lv_init();
+
+    lv_disp_draw_buf_init(&draw_buf, buf, NULL, TFT_WIDTH * 10);
+ 
+    /*Initialize the display*/
+    static lv_disp_drv_t disp_drv;
+    lv_disp_drv_init(&disp_drv);
+    /*Change the following line to your display resolution*/
+    disp_drv.hor_res = TFT_WIDTH;
+    disp_drv.ver_res = TFT_HEIGHT;
+    disp_drv.flush_cb = my_disp_flush;
+    disp_drv.draw_buf = &draw_buf;
+    lv_disp_drv_register(&disp_drv);
+}
 ///////////////MAX6675
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 MAX6675 thermocouple(MAX6675_CS,MAX6675_SCK,MAX6675_SO);
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////WS2812
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #define LEDS_COUNT  2
@@ -20,9 +55,6 @@ MAX6675 thermocouple(MAX6675_CS,MAX6675_SCK,MAX6675_SO);
 Freenove_ESP32_WS2812 strip = Freenove_ESP32_WS2812(LEDS_COUNT, LEDS_PIN, CHANNEL, TYPE_GRB);
 u8 m_color[5][3] = { {255, 0, 0}, {0, 255, 0}, {0, 0, 255}, {255, 255, 255}, {0, 0, 0} };
 int delayval = 100;
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////FreeRTOS
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 QueueHandle_t queue;//声明数据指针全局变量
@@ -72,6 +104,7 @@ void setup() {
   xTaskCreate(GetcelsiusTask,"GetCelsiusTask",10000,NULL,1,&getcelsiustask);
   SSR_Init();
   Buzzer_Init();
+  LCD_Init();
 
 }
 void loop() {
