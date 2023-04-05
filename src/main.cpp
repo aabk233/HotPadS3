@@ -97,6 +97,7 @@ void GetcelsiusTask(void * parameter)
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void setup() {
+  Serial.begin(9600);
 	strip.begin();
 	strip.setBrightness(10);	
   queue=xQueueCreate(10,sizeof(int));//队列长度为10，队列数据类型为整型
