@@ -98,7 +98,7 @@ void GetcelsiusTask(void * parameter)
 
 void setup() {
   Serial.begin(9600);
-	strip.begin();
+	strip.begin();//开启ws2812闪烁
 	strip.setBrightness(10);	
   queue=xQueueCreate(10,sizeof(int));//队列长度为10，队列数据类型为整型
   xTaskCreate(Taskone,"TaskOne",10000,NULL,1,&taskone);//创建Taskone
