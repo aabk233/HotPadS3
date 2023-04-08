@@ -7,7 +7,7 @@
 #include"lvgl.h"
 #include"TFT_eSPI.h"
 #include"SimpleFOC.h"
-
+#include "Pages\Pages.h"
 ///////////////LCD&LVGL
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 static lv_disp_draw_buf_t draw_buf;//显示器变量
@@ -59,7 +59,7 @@ int delayval = 100;
 ///////////////FreeRTOS
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 QueueHandle_t queue;//声明数据指针全局变量
-TaskHandle_t taskone,tasktwo,getcelsiustask;//声明任务句柄
+TaskHandle_t taskone,tasktwo,getcelsiustask,lvgltask;//声明任务句柄
 void Taskone( void * parameter )
 {
   while(1)
@@ -94,6 +94,14 @@ void GetcelsiusTask(void * parameter)
   Serial.print(thermocouple.readCelsius());
   vTaskDelete(NULL);
 }
+void LvglTask(void * parameter)
+{
+  while(1)
+  {
+    Open_Screen_Cartoon();
+    vTaskDelete(NULL);
+  }
+}
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void setup() {
@@ -104,6 +112,7 @@ void setup() {
   xTaskCreate(Taskone,"TaskOne",10000,NULL,1,&taskone);//创建Taskone
   xTaskCreate(Tasktwo,"TaskTwo",10000,NULL,1,&tasktwo);//创建Tasktwo
   xTaskCreate(GetcelsiusTask,"GetCelsiusTask",10000,NULL,1,&getcelsiustask);
+  xTaskCreate(LvglTask,"LvglTask",10000,NULL,1,&lvgltask);
   SSR_Init();
   Buzzer_Init();
   LCD_Init();
