@@ -30,19 +30,19 @@ void LCD_Init()
 {
     tft.init();
     tft.setRotation(0);
-    lv_init();
+    // lv_init();
 
-    lv_disp_draw_buf_init(&draw_buf, buf, NULL, TFT_WIDTH * 10);
+    // lv_disp_draw_buf_init(&draw_buf, buf, NULL, TFT_WIDTH * 10);
  
-    /*Initialize the display*/
-    static lv_disp_drv_t disp_drv;
-    lv_disp_drv_init(&disp_drv);
-    /*Change the following line to your display resolution*/
-    disp_drv.hor_res = TFT_WIDTH;
-    disp_drv.ver_res = TFT_HEIGHT;
-    disp_drv.flush_cb = my_disp_flush;
-    disp_drv.draw_buf = &draw_buf;
-    lv_disp_drv_register(&disp_drv);
+    // /*Initialize the display*/
+    // static lv_disp_drv_t disp_drv;
+    // lv_disp_drv_init(&disp_drv);
+    // /*Change the following line to your display resolution*/
+    // disp_drv.hor_res = TFT_WIDTH;
+    // disp_drv.ver_res = TFT_HEIGHT;
+    // disp_drv.flush_cb = my_disp_flush;
+    // disp_drv.draw_buf = &draw_buf;
+    // lv_disp_drv_register(&disp_drv);
 }
 ///////////////MAX6675
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -91,16 +91,15 @@ void Tasktwo(void * parameter)
 //热电偶温度获取及SSR调温
 void GetcelsiusTask(void * parameter)
 {
-  Serial.print(thermocouple.readCelsius());
+  // Serial.print(thermocouple.readCelsius());
   vTaskDelete(NULL);
 }
 void LvglTask(void * parameter)
 {
-  while(1)
-  {
-    Open_Screen_Cartoon();
+  // while(1)
+  // {
+  // }
     vTaskDelete(NULL);
-  }
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -111,12 +110,18 @@ void setup() {
   queue=xQueueCreate(10,sizeof(int));//队列长度为10，队列数据类型为整型
   xTaskCreate(Taskone,"TaskOne",10000,NULL,1,&taskone);//创建Taskone
   xTaskCreate(Tasktwo,"TaskTwo",10000,NULL,1,&tasktwo);//创建Tasktwo
-  xTaskCreate(GetcelsiusTask,"GetCelsiusTask",10000,NULL,1,&getcelsiustask);
+  // xTaskCreate(GetcelsiusTask,"GetCelsiusTask",10000,NULL,1,&getcelsiustask);
   xTaskCreate(LvglTask,"LvglTask",10000,NULL,1,&lvgltask);
   SSR_Init();
-  Buzzer_Init();
+  // Buzzer_Init();
   LCD_Init();
+  tft.setTextSize(2);
+tft.setTextColor(TFT_GREEN);
+tft.setCursor(100, 100);
 
+tft.setTextDatum(MC_DATUM);
+
+tft.drawString("Moonbeam ", 10, 10);
 }
 void loop() {
 }
